@@ -42,10 +42,6 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Terraform Format Check
-        run: terraform fmt -check
-        continue-on-error: true
-
       - name: Terraform Init
         run: terraform init
 
@@ -56,14 +52,14 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'apply' }}
         run: terraform plan -out=tfplan
 
-      # - name: Terraform Plan (destroy)
-      #   if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
-      #   run: terraform plan -destroy -out=tfplan
+      - name: Terraform Plan (destroy)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
+        run: terraform plan -destroy -out=tfplan
 
-      # - name: Terraform Apply (apply)
-      #   if: ${{ (github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.action == 'apply') }}
-      #   run: terraform apply -auto-approve tfplan
+      - name: Terraform Apply (apply)
+        if: ${{ (github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.action == 'apply') }}
+        run: terraform apply -auto-approve tfplan
 
-      # - name: Terraform Apply (destroy)
-      #   if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
-      #   run: terraform apply -auto-approve tfplan
+      - name: Terraform Apply (destroy)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
+        run: terraform apply -auto-approve tfplan
