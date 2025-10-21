@@ -7,10 +7,15 @@ on:
     paths:
       - 'infra/**'
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to run: 'apply' (default) or 'destroy'"
+        required: false
+        default: "apply"
 
 env:
-  AWS_REGION: us-east-1
-  TF_VERSION: 1.5.0
+  AWS_REGION: ap-south-1
+  TF_VERSION: 1.13.0
 
 jobs:
   terraform:
@@ -47,9 +52,18 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform Plan
+      - name: Terraform Plan (apply)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'apply' }}
         run: terraform plan -out=tfplan
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve tfplan
+      # - name: Terraform Plan (destroy)
+      #   if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
+      #   run: terraform plan -destroy -out=tfplan
+
+      # - name: Terraform Apply (apply)
+      #   if: ${{ (github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.action == 'apply') }}
+      #   run: terraform apply -auto-approve tfplan
+
+      # - name: Terraform Apply (destroy)
+      #   if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'destroy' }}
+      #   run: terraform apply -auto-approve tfplan
